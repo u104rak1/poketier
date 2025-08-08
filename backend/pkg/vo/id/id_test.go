@@ -98,9 +98,10 @@ func TestID_Equals(t *testing.T) {
 
 		// Arrange
 		id1 := id.NewSeasonID()
+		id2 := id1 // 同じIDオブジェクト
 
 		// Act
-		got := id1.Equals(id1)
+		got := id1.Equals(id2)
 
 		// Assert
 		assert.True(t, got, "same ID object should be equal to itself")

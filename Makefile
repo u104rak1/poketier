@@ -43,6 +43,12 @@ mod-tidy: ## Go modulesを更新
 test: ## テストを実行
 	docker-compose exec poketier-backend go test ./...
 
+lint: ## golangci-lintでコードチェックを実行
+	docker-compose exec poketier-backend golangci-lint run --config .golangci.json ./...
+
+lint-fix: ## golangci-lintで自動修正可能な問題を修正
+	docker-compose exec poketier-backend golangci-lint run --config .golangci.json --fix ./...
+
 clean: ## 不要なDockerリソースを削除
 	docker system prune -f
 	docker volume prune -f

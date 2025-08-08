@@ -1,3 +1,4 @@
+// Package main はポケモンティアリストアプリケーションのエントリーポイントです
 package main
 
 import (

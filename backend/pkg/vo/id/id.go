@@ -1,3 +1,4 @@
+// Package id はドメインエンティティのID値オブジェクトを提供します
 package id
 
 import (

@@ -1,0 +1,136 @@
+{
+  "run": {
+    "timeout": "5m",
+    "tests": true
+  },
+  "linters-settings": {
+    "whitespace": {
+      "multi-if": true,
+      "multi-func": true
+    },
+    "mnd": {
+      "checks": [
+        "argument",
+        "case", 
+        "condition",
+        "operation",
+        "return",
+        "assign"
+      ],
+      "ignored-numbers": [
+        "0",
+        "1", 
+        "2",
+        "10",
+        "100",
+        "1000"
+      ]
+    },
+    "tagliatelle": {
+      "case": {
+        "use-field-name": true,
+        "rules": {
+          "json": "snake",
+          "yaml": "snake",
+          "xml": "snake",
+          "toml": "snake",
+          "bson": "snake"
+        }
+      }
+    },
+    "govet": {
+      "enable-all": true,
+      "disable": [
+        "fieldalignment",
+        "shadow"
+      ]
+    },
+    "gocyclo": {
+      "min-complexity": 15
+    },
+    "dupl": {
+      "threshold": 100
+    },
+    "goconst": {
+      "min-len": 2,
+      "min-occurrences": 3
+    },
+    "misspell": {
+      "locale": "US"
+    },
+    "lll": {
+      "line-length": 120
+    },
+    "gocritic": {
+      "enabled-tags": [
+        "diagnostic",
+        "style", 
+        "performance"
+      ],
+      "disabled-checks": [
+        "unnamedResult"
+      ]
+    },
+    "funlen": {
+      "lines": 100,
+      "statements": 50
+    },
+    "revive": {
+      "rules": [
+        {
+          "name": "exported",
+          "arguments": ["checkPrivateReceivers", "sayRepetitiveInsteadOfStutters"]
+        }
+      ]
+    }
+  },
+  "linters": {
+    "enable": [
+      "errcheck",
+      "govet",
+      "ineffassign", 
+      "staticcheck",
+      "unused",
+      "whitespace",
+      "mnd",
+      "tagliatelle",
+      "bodyclose",
+      "dupl",
+      "errorlint",
+      "gochecknoinits",
+      "goconst",
+      "gocritic",
+      "gocyclo",
+      "godox", 
+      "goprintffuncname",
+      "gosec",
+      "lll",
+      "misspell",
+      "nakedret",
+      "nolintlint",
+      "revive",
+      "unconvert",
+      "unparam"
+    ]
+  },
+  "issues": {
+    "exclude-rules": [
+      {
+        "path": "_test\\.go",
+        "linters": [
+          "gocyclo",
+          "dupl",
+          "mnd"
+        ]
+      },
+      {
+        "path": "cmd/.*main\\.go",
+        "linters": [
+          "funlen"
+        ]
+      }
+    ],
+    "max-issues-per-linter": 0,
+    "max-same-issues": 0
+  }
+}
