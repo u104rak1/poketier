@@ -1,0 +1,30 @@
+# Go development environment with Delve debugger
+FROM golang:1.24.4-alpine
+
+# 必要なパッケージをインストール
+RUN apk add --no-cache git build-base
+
+# Delveをインストール
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+
+# Airをインストール（ホットリロード用）
+RUN go install github.com/air-verse/air@latest
+
+# 作業ディレクトリを設定
+WORKDIR /workspace
+
+# Go modulesをキャッシュ用にコピー
+COPY backend/go.mod backend/go.sum* ./
+RUN go mod download
+
+# プロジェクトファイルをコピー
+COPY backend/ ./
+
+# ビルド（デバッグ情報付き）
+RUN go build -gcflags="all=-N -l" -o main ./cmd/poketier
+
+# ポートを公開
+EXPOSE 8080 2345
+
+# サーバーを起動しない（デバッガーで起動）
+CMD ["sleep", "infinity"]

@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to Backend Server",
+            "type": "go",
+            "request": "attach",
+            "mode": "remote",
+            "debugAdapter": "dlv-dap",
+            "port": 2345,
+            "host": "127.0.0.1",
+            "substitutePath": [
+                {
+                    "from": "${workspaceFolder}/backend",
+                    "to": "/workspace"
+                }
+            ],
+            "showLog": true,
+            "trace": "verbose"
+        }
+    ]
+}

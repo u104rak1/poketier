@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  poketier-backend:
+    build:
+      context: .
+      dockerfile: build/Dockerfile_local
+    container_name: poketier-backend
+    networks:
+      - poketier-network
+    ports:
+      - "28080:8080"  # アプリケーションポート
+      - "2345:2345"   # Delveデバッガーポート
+    volumes:
+      - ./backend:/workspace
+      - go-mod-cache:/go/pkg/mod
+    environment:
+      - CGO_ENABLED=0
+    # Delveデバッガーを自動起動
+    command: ["air", "-c", ".air.toml"]
+    stdin_open: true
+    tty: true
+
+networks:
+  poketier-network:
+    driver: bridge
+
+volumes:
+  go-mod-cache:

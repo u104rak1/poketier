@@ -2,6 +2,7 @@
 
 ## 概要
 ポケモンカードゲームのティアリストアプリ「PokeTier」の開発資料を管理するリポジトリです。
+各開発案件毎に{index}_{projectName}ディレクトリを作成し、以下の文書を作成します。
 
 ## 各プロジェクトの文書構成
 1. **PRD (Product Requirements Document)** - `prd.md`
