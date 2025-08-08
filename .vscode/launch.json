@@ -6,9 +6,11 @@
             "type": "go",
             "request": "attach",
             "mode": "remote",
-            "debugAdapter": "dlv-dap",
-            "port": 2345,
+            "debugAdapter": "legacy",
+            "port": 22345,
             "host": "127.0.0.1",
+            "cwd": "${workspaceFolder}/backend",
+            "remotePath": "/workspace",
             "substitutePath": [
                 {
                     "from": "${workspaceFolder}/backend",
@@ -16,7 +18,8 @@
                 }
             ],
             "showLog": true,
-            "trace": "verbose"
+            "trace": "verbose",
+            "logOutput": "debugger"
         }
     ]
 }

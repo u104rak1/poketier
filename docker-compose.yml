@@ -10,14 +10,14 @@ services:
       - poketier-network
     ports:
       - "28080:8080"  # アプリケーションポート
-      - "2345:2345"   # Delveデバッガーポート
+      - "22345:2345"  # Delveデバッガーポート
     volumes:
       - ./backend:/workspace
       - go-mod-cache:/go/pkg/mod
     environment:
       - CGO_ENABLED=0
-    # Delveデバッガーを自動起動
-    command: ["air", "-c", ".air.toml"]
+    # コンテナを永続化（Delve・Goアプリは手動制御）
+    command: ["/bin/sh", "-c", "while true; do sleep 30; done"]
     stdin_open: true
     tty: true
 

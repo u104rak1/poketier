@@ -19,6 +19,24 @@ logs: ## Docker バックエンドコンテナのログを表示
 shell: ## バックエンドコンテナにシェルでアクセス
 	docker-compose exec poketier-backend sh
 
+# アプリケーション制御コマンド
+run: ## DelveデバッガーとAPIサーバーを同時起動
+	docker-compose exec -d poketier-backend dlv debug ./cmd/poketier --headless --listen=:2345 --api-version=2 --accept-multiclient --continue
+	sleep 2
+
+stop: ## DelveとAPIサーバーを完全停止（コンテナは永続化維持）
+	docker-compose exec poketier-backend pkill -f "go run" || true
+	docker-compose exec poketier-backend pkill -f "__debug_bin" || true
+	docker-compose exec poketier-backend pkill -f "poketier" || true
+	docker-compose exec poketier-backend pkill -f "dlv" || true
+	sleep 2
+
+rerun: ## make stop → make run
+	make stop && make run
+
+health: ## バックエンドコンテナのヘルスチェック
+	curl -f http://localhost:28080/health
+
 mod-tidy: ## Go modulesを更新
 	docker-compose exec poketier-backend go mod tidy
 
