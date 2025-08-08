@@ -5,9 +5,12 @@
 ```
 poketier/
 ├── backend/
+│   ├── apps/                     # コンテキスト毎に境界付けされたアプリケーション
+│   │   └── tierlist/             # TierListコンテキストアプリ
 │   ├── cmd/
 │   │   └── poketier/
 │   │       └── main.go           # エントリーポイント
+│   ├── pkg/
 │   ├── go.mod
 │   └── go.sum
 ├── build/
