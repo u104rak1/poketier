@@ -49,6 +49,35 @@ lint: ## golangci-lintでコードチェックを実行
 lint-fix: ## golangci-lintで自動修正可能な問題を修正
 	docker-compose exec poketier-backend golangci-lint run --config .golangci.json --fix ./...
 
+# データベース関連コマンド
+migrate-up: ## マイグレーションを適用（UP）
+	docker-compose exec poketier-backend migrate -path ./sqlc/migrations -database "postgresql://local_user:password@postgres:5432/POCGO_LOCAL_DB?sslmode=disable" up
+
+migrate-down: ## マイグレーションを1つ戻す（DOWN）
+	docker-compose exec poketier-backend migrate -path ./sqlc/migrations -database "postgresql://local_user:password@postgres:5432/POCGO_LOCAL_DB?sslmode=disable" down 1
+
+migrate-force: ## マイグレーションバージョンを強制設定（例: make migrate-force VERSION=1）
+	docker-compose exec poketier-backend migrate -path ./sqlc/migrations -database "postgresql://local_user:password@postgres:5432/POCGO_LOCAL_DB?sslmode=disable" force $(VERSION)
+
+migrate-version: ## 現在のマイグレーションバージョンを表示
+	docker-compose exec poketier-backend migrate -path ./sqlc/migrations -database "postgresql://local_user:password@postgres:5432/POCGO_LOCAL_DB?sslmode=disable" version
+
+sqlc-generate: ## SQLCでGoコードを生成
+	docker-compose exec poketier-backend sqlc generate -f ./sqlc/sqlc.json
+
+sqlc-vet: ## SQLCで設定とクエリをチェック
+	docker-compose exec poketier-backend sqlc vet -f ./sqlc/sqlc.json
+
+# 開発用ショートカットコマンド
+db-reset: ## データベースを初期化（DOWN→UP→SQLCコード生成）
+	make migrate-down || true
+	make migrate-up
+	make sqlc-generate
+
+db-setup: ## 初回データベースセットアップ（マイグレーション適用→SQLCコード生成）
+	make migrate-up
+	make sqlc-generate
+
 clean: ## 不要なDockerリソースを削除
 	docker system prune -f
 	docker volume prune -f

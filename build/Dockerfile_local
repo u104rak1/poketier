@@ -1,17 +1,13 @@
 # Go development environment with Delve debugger
 FROM golang:1.24.4-alpine
 
-# 必要なパッケージをインストール
-RUN apk add --no-cache git build-base
-
-# Delveをインストール
-RUN go install github.com/go-delve/delve/cmd/dlv@latest
-
-# Airをインストール（ホットリロード用）
-RUN go install github.com/air-verse/air@latest
-
-# golangci-lintをバイナリでインストール
-RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.64.8
+# 必要なパッケージと開発ツールをインストール
+RUN apk add --no-cache git build-base wget && \
+    go install github.com/go-delve/delve/cmd/dlv@latest && \
+    go install github.com/air-verse/air@latest && \
+    go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest && \
+    go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest && \
+    wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.64.8
 
 # 作業ディレクトリを設定
 WORKDIR /workspace
