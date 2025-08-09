@@ -6,19 +6,20 @@
 poketier/
 ├── backend/
 │   ├── apps/                     # コンテキスト毎に境界付けされたアプリケーション
-│   │   └── tierlist/             # TierListコンテキストアプリ
+│   │   └── tierlist/             # TierListアプリ
 │   ├── cmd/
 │   │   └── poketier/
 │   │       └── main.go           # エントリーポイント
-│   ├── pkg/
+│   ├── env/                      # 環境変数
+│   ├── pkg/                      # ユーティリティパッケージ
+│   ├── sqlc/                     # sqlc関連
 │   ├── go.mod
 │   └── go.sum
 ├── build/
 │   └── Dockerfile_local          # 開発用Dockerfile
+├── docs/                         # ドキュメント
 ├── docker-compose.yml            # Docker構成
-├── Makefile                      # 開発用コマンド
-└── .vscode/
-    └── launch.json               # VSCodeデバッグ設定
+└── Makefile                      # 開発用コマンド
 ```
 
 ## 技術スタック
@@ -32,16 +33,17 @@ poketier/
 ## ローカル開発環境
 
 ### 仕組み
-VSCodeでの開発を想定しています。
-ホストマシンにDockerがインストールされている事を前提としています。
+VSCodeでの開発を想定しています。ホストマシンにDockerがインストールされている事を前提としています。
 
-1. **Docker環境**：
-   - `docker-compose up -d` でコンテナを起動
-   - Goアプリケーションは手動で制御（安定性重視）
-   - ポート：`28080`（アプリ）、`22345`（デバッガー）
+1. Docker環境：
+   - `docker-compose up -d` でコンテナを起動。開発に関わる全てをコンテナで管理。
+      - バックエンドのGolangコンテナ
+      - フロントエンドのNode.jsコンテナ
+      - PostgreSQLコンテナ
+      - Redisコンテナ
 
-2. **手動制御開発環境**：
-   - **完全制御**: アプリの起動/停止を手動で管理
+2. 手動制御開発環境：
+   - **完全制御**: バックエンドアプリの起動/停止を手動で管理
    - **デバッグ**: 必要な時にのみアタッチ
 
 ### 開発手順
@@ -58,7 +60,7 @@ make build && make up
 1. **コンテナ起動**: `make up` でコンテナを永続化起動
 2. **アプリケーション起動**: `make run` でDelveデバッガー + APIサーバーを同時起動
 3. **VS Codeでデバッグ接続**: `F5` を押して "Attach to Backend Server" を選択
-4. **ブレークポイント設定**: `backend/cmd/poketier/main.go` でブレークポイントを設定
+4. **ブレークポイント設定**: ブレークポイントを設定
 5. **API動作確認**: `make health` でAPIの疎通確認
 6. **コード変更後の再起動**: `make rerun` で停止→起動
 7. **デバッガー再接続**: VS Codeで再度 `F5` を押してデバッガー再接続
@@ -68,7 +70,6 @@ make build && make up
 **🔧 効率的な開発のコツ**:
 - **アプリ停止**: `make stop` でクリーンに停止
 - **即座に再起動**: `make rerun` で stop→run を一括実行
-- **接続確認**: `make health` でAPIの疎通確認
 
 **⚠️ 重要: ブレークポイントの正しい設定順序**
 
