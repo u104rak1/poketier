@@ -7,7 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"poketier/config/env"
+	"poketier/env"
 )
 
 // NewPgxPool は 環境変数からPostgreSQLへの接続プールを作成
