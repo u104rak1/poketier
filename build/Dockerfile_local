@@ -6,6 +6,7 @@ RUN apk add --no-cache git build-base wget && \
     go install github.com/go-delve/delve/cmd/dlv@latest && \
     go install github.com/air-verse/air@latest && \
     go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest && \
+    go install go.uber.org/mock/mockgen@latest && \
     go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest && \
     wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.64.8
 

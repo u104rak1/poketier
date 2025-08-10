@@ -43,6 +43,20 @@ mod-tidy: ## Go modulesを更新
 test: ## テストを実行
 	docker-compose exec poketier-backend go test ./...
 
+mockgen: ## モックを生成（例: make mockgen PATH=./pkg/vo/id/id.go）
+	@if [ -z "$(PATH)" ]; then \
+		echo "Error: PATH is required. Usage: make mockgen PATH=./path/to/file.go"; \
+		exit 1; \
+	fi; \
+	if [ ! -f "backend/$(PATH)" ]; then \
+		echo "Error: File backend/$(PATH) does not exist"; \
+		exit 1; \
+	fi; \
+	PACKAGE_NAME=$$(basename $$(dirname $(PATH))); \
+	OUTPUT_FILE=$$(dirname $(PATH))/$${PACKAGE_NAME}_mock_test.go; \
+	docker-compose exec poketier-backend mockgen -source=$(PATH) -destination=$${OUTPUT_FILE} -package=$${PACKAGE_NAME}_test && \
+	echo "Mock generated: $${OUTPUT_FILE}"
+
 lint: ## golangci-lintでコードチェックを実行
 	docker-compose exec poketier-backend golangci-lint run --config .golangci.json ./...
 
