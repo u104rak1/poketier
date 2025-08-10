@@ -7,7 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgtype"
 
-	"poketier/apps/tierlist/internal/domain/entity"
+	"poketier/apps/season/internal/domain/entity"
 	"poketier/pkg/vo/id"
 	"poketier/sqlc/db"
 )

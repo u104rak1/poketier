@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	"poketier/apps/tierlist/internal/domain/entity"
+	"poketier/apps/season/internal/domain/entity"
 )
 
 // SeasonDomainService はSeasonに関するドメインサービス

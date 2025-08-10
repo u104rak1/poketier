@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"poketier/apps/tierlist/internal/domain/entity"
-	"poketier/apps/tierlist/internal/usecase"
+	"poketier/apps/season/internal/application/usecase"
+	"poketier/apps/season/internal/domain/entity"
 	"poketier/pkg/vo/id"
 
 	"github.com/stretchr/testify/assert"

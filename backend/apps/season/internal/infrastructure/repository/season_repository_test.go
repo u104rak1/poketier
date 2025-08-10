@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
-	"poketier/apps/tierlist/internal/domain/entity"
-	"poketier/apps/tierlist/internal/infrastructure/repository"
+	"poketier/apps/season/internal/domain/entity"
+	"poketier/apps/season/internal/infrastructure/repository"
 	"poketier/pkg/vo/id"
 	"poketier/sqlc/db"
 )

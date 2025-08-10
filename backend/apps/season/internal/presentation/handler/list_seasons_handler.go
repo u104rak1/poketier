@@ -3,7 +3,8 @@ package handler
 import (
 	"context"
 	"net/http"
-	"poketier/apps/tierlist/internal/usecase"
+	"poketier/apps/season/internal/application/usecase"
+	"poketier/apps/season/internal/presentation/response"
 	"poketier/pkg/errs"
 
 	"github.com/gin-gonic/gin"
@@ -11,12 +12,6 @@ import (
 
 type listSeasonsHandler struct {
 	uc ListSeasonsUseCase
-}
-
-// Response構造体
-type listSeasonsResponse struct {
-	Total   int                `json:"total"`
-	Seasons []usecase.LSSeason `json:"seasons"`
 }
 
 type ListSeasonsUseCase interface {
@@ -36,12 +31,5 @@ func (h *listSeasonsHandler) Handle(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, h.toResponse(result))
-}
-
-func (h *listSeasonsHandler) toResponse(result *usecase.ListSeasonsResult) listSeasonsResponse {
-	return listSeasonsResponse{
-		Total:   len(result.Seasons),
-		Seasons: result.Seasons,
-	}
+	ctx.JSON(http.StatusOK, response.NewListSeasonsResponse(result))
 }

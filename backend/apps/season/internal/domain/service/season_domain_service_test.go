@@ -1,14 +1,14 @@
 package service_test
 
 import (
-"testing"
-"time"
+	"testing"
+	"time"
 
-"poketier/apps/tierlist/internal/domain/entity"
-"poketier/apps/tierlist/internal/domain/service"
-"poketier/pkg/vo/id"
+	"poketier/apps/season/internal/domain/entity"
+	"poketier/apps/season/internal/domain/service"
+	"poketier/pkg/vo/id"
 
-"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSeasonDomainService_EnsureUniqueActiveSeason(t *testing.T) {
@@ -54,7 +54,7 @@ func TestSeasonDomainService_EnsureUniqueActiveSeason(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.caseName, func(t *testing.T) {
-t.Parallel()
+			t.Parallel()
 
 			// Arrange
 			domainService := service.NewSeasonDomainService()

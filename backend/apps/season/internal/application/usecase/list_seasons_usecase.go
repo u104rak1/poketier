@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"poketier/apps/tierlist/internal/domain/entity"
+	"poketier/apps/season/internal/domain/entity"
 	"time"
 )
 
