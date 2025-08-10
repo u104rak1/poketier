@@ -25,6 +25,8 @@ func TestNewEnv(t *testing.T) {
 				POSTGRES_PASSWORD: "password",
 				POSTGRES_PORT:     "5432",
 				POSTGRES_SSLMODE:  "disable",
+				LOG_LEVEL:         "debug",
+				IS_SILENT_LOG:     false,
 			},
 		},
 		{
@@ -37,6 +39,8 @@ func TestNewEnv(t *testing.T) {
 				"POSTGRES_PASSWORD": "test_password",
 				"POSTGRES_PORT":     "5433",
 				"POSTGRES_SSLMODE":  "require",
+				"LOG_LEVEL":         "info",
+				"IS_SILENT_LOG":     "true",
 			},
 			want: &env.Env{
 				APP_PORT:          "9000",
@@ -46,6 +50,8 @@ func TestNewEnv(t *testing.T) {
 				POSTGRES_PASSWORD: "test_password",
 				POSTGRES_PORT:     "5433",
 				POSTGRES_SSLMODE:  "require",
+				LOG_LEVEL:         "info",
+				IS_SILENT_LOG:     true,
 			},
 		},
 		{
@@ -62,6 +68,8 @@ func TestNewEnv(t *testing.T) {
 				POSTGRES_PASSWORD: "password",
 				POSTGRES_PORT:     "5432",
 				POSTGRES_SSLMODE:  "disable",
+				LOG_LEVEL:         "debug",
+				IS_SILENT_LOG:     false,
 			},
 		},
 	}
@@ -95,6 +103,8 @@ func TestNewEnv_DefaultValues(t *testing.T) {
 		assert.Equal(t, "password", got.POSTGRES_PASSWORD, "POSTGRES_PASSWORD default value is incorrect")
 		assert.Equal(t, "5432", got.POSTGRES_PORT, "POSTGRES_PORT default value is incorrect")
 		assert.Equal(t, "disable", got.POSTGRES_SSLMODE, "POSTGRES_SSLMODE default value is incorrect")
+		assert.Equal(t, "debug", got.LOG_LEVEL, "LOG_LEVEL default value is incorrect")
+		assert.Equal(t, false, got.IS_SILENT_LOG, "IS_SILENT_LOG default value is incorrect")
 	})
 }
 
@@ -108,6 +118,8 @@ func TestNewEnv_EnvironmentVariables(t *testing.T) {
 		t.Setenv("POSTGRES_PASSWORD", "test-secret")
 		t.Setenv("POSTGRES_PORT", "5555")
 		t.Setenv("POSTGRES_SSLMODE", "verify-full")
+		t.Setenv("LOG_LEVEL", "error")
+		t.Setenv("IS_SILENT_LOG", "true")
 
 		// Act
 		got := env.NewEnv()
@@ -120,5 +132,7 @@ func TestNewEnv_EnvironmentVariables(t *testing.T) {
 		assert.Equal(t, "test-secret", got.POSTGRES_PASSWORD, "POSTGRES_PASSWORD environment variable is not set correctly")
 		assert.Equal(t, "5555", got.POSTGRES_PORT, "POSTGRES_PORT environment variable is not set correctly")
 		assert.Equal(t, "verify-full", got.POSTGRES_SSLMODE, "POSTGRES_SSLMODE environment variable is not set correctly")
+		assert.Equal(t, "error", got.LOG_LEVEL, "LOG_LEVEL environment variable is not set correctly")
+		assert.Equal(t, true, got.IS_SILENT_LOG, "IS_SILENT_LOG environment variable is not set correctly")
 	})
 }
