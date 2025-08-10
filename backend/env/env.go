@@ -7,7 +7,9 @@ import (
 )
 
 type Env struct {
-	APP_PORT string `env:"APP_PORT" envDefault:"8080"`
+	APP_PORT      string `env:"APP_PORT" envDefault:"8080"`
+	APP_ENV       string `env:"APP_ENV" envDefault:"local"`
+	ALLOW_ORIGINS string `env:"ALLOW_ORIGINS" envDefault:"*"`
 
 	POSTGRES_HOST     string `env:"POSTGRES_HOST" envDefault:"postgres"`
 	POSTGRES_DBNAME   string `env:"POSTGRES_DBNAME" envDefault:"poketierlocal"`

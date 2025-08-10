@@ -1,0 +1,47 @@
+paths:
+  /v1/seasons:
+    get:
+      summary: シーズン一覧取得
+      description: |
+        登録されているすべてのシーズン情報を取得します。
+        
+        ### 仕様
+        - 認証は不要です
+        - すべてのシーズンが返されます（ページネーションなし）
+        - シーズンは作成日時順でソートされます
+        
+        ### レスポンス形式
+        - `total`: 取得したシーズンの総数
+        - `seasons`: シーズン情報の配列
+      operationId: listSeasons
+      tags:
+        - Seasons
+      responses:
+        '200':
+          description: シーズン一覧の取得に成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - total
+                  - seasons
+                properties:
+                  total:
+                    type: integer
+                    description: 取得したシーズンの総数
+                    minimum: 0
+                    example: 1
+                  seasons:
+                    type: array
+                    description: シーズン情報の配列
+                    items:
+                      $ref: '../../../components/schemas/season.yml#/Season'
+                empty:
+                  summary: シーズンが存在しない場合
+                  value:
+                    total: 0
+                    seasons: []
+        
+        '500':
+          $ref: '../../../components/responses/errors.yml#/InternalServerError'

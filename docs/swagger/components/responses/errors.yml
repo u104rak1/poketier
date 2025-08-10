@@ -1,0 +1,78 @@
+# 共通エラーレスポンス定義
+
+BadRequest:
+  description: 不正なリクエスト
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml#/ErrorResponse'
+      example:
+        title: "Bad Request"
+        status: 400
+        detail: "The request is invalid."
+
+Unauthorized:
+  description: 認証が必要
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml#/ErrorResponse'
+      example:
+        title: "Unauthorized"
+        status: 401
+        detail: "Authentication is required."
+
+Forbidden:
+  description: アクセス権限がない
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml#/ErrorResponse'
+      example:
+        title: "Forbidden"
+        status: 403
+        detail: "You do not have permission to perform this action."
+
+NotFound:
+  description: リソースが見つからない
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml#/ErrorResponse'
+      example:
+        title: "Not Found"
+        status: 404
+        detail: "The requested resource was not found."
+
+RequestTimeout:
+  description: リクエストタイムアウト
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml#/ErrorResponse'
+      example:
+        title: "Request Timeout"
+        status: 408
+        detail: "The request timed out."
+
+Conflict:
+  description: リソースの競合
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml#/ErrorResponse'
+      example:
+        title: "Conflict"
+        status: 409
+        detail: "A resource conflict occurred."
+
+InternalServerError:
+  description: 内部サーバーエラー
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml#/ErrorResponse'
+      example:
+        title: "Internal Server Error"
+        status: 500
+        detail: "An unexpected error occurred."

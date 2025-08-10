@@ -1,0 +1,27 @@
+# 共通エラーレスポンス定義（RFC 9457準拠）
+
+ErrorResponse:
+  type: object
+  required:
+    - title
+    - status
+    - detail
+  properties:
+    title:
+      type: string
+      description: 人間が読めるエラーの要約
+      example: "Bad Request"
+    status:
+      type: integer
+      description: HTTPステータスコード
+      example: 400
+    detail:
+      type: string
+      description: エラーの詳細説明
+      example: "The request is invalid."
+    errors:
+      type: array
+      description: バリデーションエラーメッセージの配列（オプション）
+      items:
+        type: string
+      example: ["name is required", "email format is invalid"]

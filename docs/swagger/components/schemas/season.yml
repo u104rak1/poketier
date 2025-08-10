@@ -1,0 +1,35 @@
+# 共通で使用するスキーマ定義
+
+Season:
+  type: object
+  required:
+    - season_id
+    - name
+    - start_date
+    - end_date
+    - is_active
+  properties:
+    season_id:
+      type: string
+      description: シーズンの一意識別子
+      example: "0198934b-2ec7-7e30-b80c-6d0734e34afe"
+    name:
+      type: string
+      description: シーズン名
+      example: "A2b"
+      minLength: 0
+      maxLength: 5
+    start_date:
+      type: string
+      format: date-time
+      description: シーズン開始日時（ISO 8601形式）
+      example: "2024-01-01T00:00:00Z"
+    end_date:
+      type: string
+      format: date-time
+      description: シーズン終了日時（ISO 8601形式）
+      example: "2024-03-31T23:59:59Z"
+    is_active:
+      type: boolean
+      description: シーズンがアクティブかどうか
+      example: true

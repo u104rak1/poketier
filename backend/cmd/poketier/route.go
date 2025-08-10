@@ -4,6 +4,7 @@ import (
 	"context"
 	"poketier/apps/season"
 	"poketier/env"
+	"poketier/pkg/cors"
 	"poketier/pkg/log"
 	"poketier/sqlc"
 	"poketier/sqlc/db"
@@ -26,6 +27,9 @@ func startServer() {
 	queries := db.New(pool)
 
 	r := gin.Default()
+
+	// CORSミドルウェアを設定
+	cors.SetCORS(r, envConfig.ALLOW_ORIGINS, envConfig.APP_ENV)
 
 	// ログミドルウェアを設定
 	r.Use(log.NewMiddleware(envConfig.LOG_LEVEL, envConfig.IS_SILENT_LOG))

@@ -1,0 +1,79 @@
+openapi: 3.0.3
+info:
+  title: PokeTier API
+  description: ポケモンカードのティアリストアプリケーション API
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@poketier.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:28080
+    description: ローカル環境サーバー
+
+paths:
+  /health:
+    get:
+      summary: ヘルスチェック
+      description: サーバーの稼働状況を確認するエンドポイント
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: サーバーが正常に稼働中
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  # Season関連のエンドポイント
+  /v1/seasons:
+    $ref: './apps/season/list-seasons.yml#/paths/~1v1~1seasons'
+
+components:
+  # 共通コンポーネントの定義
+  schemas:
+    # エラーレスポンス（RFC 9457準拠）
+    ErrorResponse:
+      $ref: './components/schemas/error.yml#/ErrorResponse'
+    
+    # シーズン関連
+    Season:
+      $ref: './components/schemas/season.yml#/Season'
+
+  # 共通レスポンス例
+  responses:
+    BadRequest:
+      $ref: './components/responses/errors.yml#/BadRequest'
+    
+    Unauthorized:
+      $ref: './components/responses/errors.yml#/Unauthorized'
+    
+    Forbidden:
+      $ref: './components/responses/errors.yml#/Forbidden'
+    
+    NotFound:
+      $ref: './components/responses/errors.yml#/NotFound'
+    
+    Conflict:
+      $ref: './components/responses/errors.yml#/Conflict'
+    
+    RequestTimeout:
+      $ref: './components/responses/errors.yml#/RequestTimeout'
+    
+    InternalServerError:
+      $ref: './components/responses/errors.yml#/InternalServerError'
+
+tags:
+  - name: Health
+    description: ヘルスチェック関連
+  - name: Seasons
+    description: シーズン管理関連
