@@ -43,18 +43,23 @@ mod-tidy: ## Go modulesを更新
 test: ## テストを実行
 	docker-compose exec poketier-backend go test ./...
 
-mockgen: ## モックを生成（例: make mockgen PATH=./pkg/vo/id/id.go）
-	@if [ -z "$(PATH)" ]; then \
-		echo "Error: PATH is required. Usage: make mockgen PATH=./path/to/file.go"; \
+mockgen: ## モックを生成（例: make mockgen FILE=./apps/tierlist/internal/usecase/list_season_usecase.go PKG=usecase_test）
+	@if [ -z "$(FILE)" ]; then \
+		echo "Error: FILE is required. Usage: make mockgen FILE=./path/to/file.go PKG=package_test"; \
 		exit 1; \
 	fi; \
-	if [ ! -f "backend/$(PATH)" ]; then \
-		echo "Error: File backend/$(PATH) does not exist"; \
+	if [ -z "$(PKG)" ]; then \
+		echo "Error: PKG is required. Usage: make mockgen FILE=./path/to/file.go PKG=package_test"; \
 		exit 1; \
 	fi; \
-	PACKAGE_NAME=$$(basename $$(dirname $(PATH))); \
-	OUTPUT_FILE=$$(dirname $(PATH))/$${PACKAGE_NAME}_mock_test.go; \
-	docker-compose exec poketier-backend mockgen -source=$(PATH) -destination=$${OUTPUT_FILE} -package=$${PACKAGE_NAME}_test && \
+	if [ ! -f "backend/$(FILE)" ]; then \
+		echo "Error: File backend/$(FILE) does not exist"; \
+		exit 1; \
+	fi; \
+	PACKAGE_DIR=$$(echo "$(FILE)" | sed 's|\/[^\/]*$$||'); \
+	BASE_FILENAME=$$(echo "$(FILE)" | sed 's|.*\/||' | sed 's|\.go$$||'); \
+	OUTPUT_FILE=$${PACKAGE_DIR}/$${BASE_FILENAME}_mock_test.go; \
+	/Users/yuto.araki/.rd/bin/docker-compose exec poketier-backend mockgen -source=$(FILE) -destination=$${OUTPUT_FILE} -package=$(PKG) && \
 	echo "Mock generated: $${OUTPUT_FILE}"
 
 lint: ## golangci-lintでコードチェックを実行
