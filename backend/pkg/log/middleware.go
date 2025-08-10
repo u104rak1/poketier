@@ -1,11 +1,34 @@
 package log
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
+
+// extractErrorDetails エラーチェーンを辿って詳細情報を抽出
+func extractErrorDetails(err error) []any {
+	var logArgs []any
+
+	// エラーチェーンを辿る
+	var errorChain []string
+	for e := err; e != nil; e = errors.Unwrap(e) {
+		errorChain = append(errorChain, e.Error())
+	}
+
+	if len(errorChain) > 1 {
+		logArgs = append(logArgs, "error_chain", errorChain)
+		logArgs = append(logArgs, "root_cause", errorChain[len(errorChain)-1])
+	}
+
+	// エラーの型情報も追加
+	logArgs = append(logArgs, "error_type", fmt.Sprintf("%T", err))
+
+	return logArgs
+}
 
 func NewMiddleware(logLevel string, isSilent bool) gin.HandlerFunc {
 	logger := newLogger(logLevel, isSilent)
@@ -42,11 +65,24 @@ func NewMiddleware(logLevel string, isSilent bool) gin.HandlerFunc {
 			"duration_ms", duration.Milliseconds(),
 		}
 
+		// エラーがある場合は詳細情報を追加
+		if len(c.Errors) > 0 {
+			for _, ginErr := range c.Errors {
+				errorDetails := extractErrorDetails(ginErr.Err)
+				logArgs = append(logArgs, "gin_error_type", ginErr.Type)
+				logArgs = append(logArgs, errorDetails...)
+			}
+		}
+
+		var (
+			clientErrorStatusCode = 400
+			serverErrorStatusCode = 500
+		)
 		switch {
-		case statusCode >= 400 && statusCode < 500:
+		case statusCode >= clientErrorStatusCode && statusCode < serverErrorStatusCode:
 			// 4xx: クライアントエラー
 			requestLogger.Warn("Request completed with client error", logArgs...)
-		case statusCode >= 500:
+		case statusCode >= serverErrorStatusCode:
 			// 5xx: サーバーエラー
 			requestLogger.Error("Request completed with server error", logArgs...)
 		default:

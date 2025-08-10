@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"poketier/apps/tierlist/internal/domain/entity"
 	"time"
 )
@@ -33,11 +34,11 @@ func NewListSeasonsUsecase(seasonRepo LSSeasonRepository) *ListSeasonsUsecase {
 	}
 }
 
-// Execute はジーズン一覧取得を実行
+// Execute はシーズン一覧取得を実行
 func (u *ListSeasonsUsecase) Execute(ctx context.Context) (*ListSeasonsResult, error) {
 	seasons, err := u.seasonRepo.FindAll(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to find all seasons: %w", err)
 	}
 
 	return u.toResult(seasons), nil
