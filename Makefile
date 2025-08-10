@@ -13,8 +13,11 @@ up: ## Docker コンテナを起動
 down: ## Docker コンテナを停止・削除
 	docker-compose down
 
-logs: ## Docker バックエンドコンテナのログを表示
-	docker-compose logs -f poketier-backend
+logs: ## 開発環境のアプリケーションログをリアルタイム表示
+	docker-compose exec poketier-backend tail -f /tmp/app.log 2>/dev/null || echo "Log file not found. Make sure the server is running."
+
+clear-logs: ## 開発環境のログファイルをクリア
+	docker-compose exec poketier-backend rm -f /tmp/app.log && echo "Log file cleared."
 
 shell: ## バックエンドコンテナにシェルでアクセス
 	docker-compose exec poketier-backend sh
