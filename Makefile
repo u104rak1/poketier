@@ -46,6 +46,26 @@ mod-tidy: ## Go modulesを更新
 test: ## テストを実行
 	docker-compose exec poketier-backend go test ./...
 
+wire-all: ## 全アプリのWireコードを生成
+	@for app in $$(find backend/apps -maxdepth 1 -type d | grep -v '^backend/apps$$' | xargs -I {} basename {}); do \
+		if [ -f "backend/apps/$$app/di.go" ]; then \
+			echo "Generating wire for $$app..."; \
+			make wire APP=$$app; \
+		fi; \
+	done
+
+wire: ## Wire によるDIコード生成（例: make wire APP=season）
+	@if [ -z "$(APP)" ]; then \
+		echo "Error: APP is required. Usage: make wire APP=season"; \
+		exit 1; \
+	fi; \
+	if [ ! -d "backend/apps/$(APP)" ]; then \
+		echo "Error: Directory backend/apps/$(APP) does not exist"; \
+		exit 1; \
+	fi; \
+	docker-compose exec poketier-backend wire ./apps/$(APP) && \
+	echo "Wire DI code generated for $(APP)"
+
 mockgen: ## モックを生成（例: make mockgen FILE=./apps/tierlist/internal/usecase/list_season_usecase.go PKG=usecase_test）
 	@if [ -z "$(FILE)" ]; then \
 		echo "Error: FILE is required. Usage: make mockgen FILE=./path/to/file.go PKG=package_test"; \
@@ -73,22 +93,29 @@ lint-fix: ## golangci-lintで自動修正可能な問題を修正
 
 # データベース関連コマンド
 migrate-up: ## マイグレーションを適用（UP）
-	docker-compose exec poketier-backend migrate -path ./sqlc/migrations -database "postgresql://local_user:password@postgres:5432/POCGO_LOCAL_DB?sslmode=disable" up
+	docker-compose exec poketier-backend migrate -path ./sqlc/migrations -database "postgresql://dbuser:Password123@postgres:5432/poketierlocal?sslmode=disable" up
 
 migrate-down: ## マイグレーションを1つ戻す（DOWN）
-	docker-compose exec poketier-backend migrate -path ./sqlc/migrations -database "postgresql://local_user:password@postgres:5432/POCGO_LOCAL_DB?sslmode=disable" down 1
+	docker-compose exec poketier-backend migrate -path ./sqlc/migrations -database "postgresql://dbuser:Password123@postgres:5432/poketierlocal?sslmode=disable" down 1
 
 migrate-force: ## マイグレーションバージョンを強制設定（例: make migrate-force VERSION=1）
-	docker-compose exec poketier-backend migrate -path ./sqlc/migrations -database "postgresql://local_user:password@postgres:5432/POCGO_LOCAL_DB?sslmode=disable" force $(VERSION)
+	docker-compose exec poketier-backend migrate -path ./sqlc/migrations -database "postgresql://dbuser:Password123@postgres:5432/poketierlocal?sslmode=disable" force $(VERSION)
 
 migrate-version: ## 現在のマイグレーションバージョンを表示
-	docker-compose exec poketier-backend migrate -path ./sqlc/migrations -database "postgresql://local_user:password@postgres:5432/POCGO_LOCAL_DB?sslmode=disable" version
+	docker-compose exec poketier-backend migrate -path ./sqlc/migrations -database "postgresql://dbuser:Password123@postgres:5432/poketierlocal?sslmode=disable" version
 
 sqlc-generate: ## SQLCでGoコードを生成
 	docker-compose exec poketier-backend sqlc generate -f ./sqlc/sqlc.json
 
 sqlc-vet: ## SQLCで設定とクエリをチェック
 	docker-compose exec poketier-backend sqlc vet -f ./sqlc/sqlc.json
+
+# シード・テストデータ関連コマンド
+seed: ## テストデータを挿入
+	docker-compose exec postgres psql -U dbuser -d poketierlocal -f /workspace/sqlc/seeds/test_data.sql
+
+seed-from-host: ## ホストからテストデータを挿入（コンテナ外から実行）
+	docker-compose exec -T postgres psql -U dbuser -d poketierlocal < backend/sqlc/seeds/test_data.sql
 
 # 開発用ショートカットコマンド
 db-reset: ## データベースを初期化（DOWN→UP→SQLCコード生成）
@@ -99,6 +126,11 @@ db-reset: ## データベースを初期化（DOWN→UP→SQLCコード生成）
 db-setup: ## 初回データベースセットアップ（マイグレーション適用→SQLCコード生成）
 	make migrate-up
 	make sqlc-generate
+
+db-setup-with-seed: ## 初回データベースセットアップ＋テストデータ挿入
+	make migrate-up
+	make sqlc-generate
+	make seed-from-host
 
 clean: ## 不要なDockerリソースを削除
 	docker system prune -f

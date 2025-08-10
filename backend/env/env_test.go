@@ -20,9 +20,9 @@ func TestNewEnv(t *testing.T) {
 			want: &env.Env{
 				APP_PORT:          "8080",
 				POSTGRES_HOST:     "postgres",
-				POSTGRES_DBNAME:   "POCGO_LOCAL_DB",
-				POSTGRES_USER:     "local_user",
-				POSTGRES_PASSWORD: "password",
+				POSTGRES_DBNAME:   "poketierlocal",
+				POSTGRES_USER:     "dbuser",
+				POSTGRES_PASSWORD: "Password123",
 				POSTGRES_PORT:     "5432",
 				POSTGRES_SSLMODE:  "disable",
 				LOG_LEVEL:         "debug",
@@ -64,8 +64,8 @@ func TestNewEnv(t *testing.T) {
 				APP_PORT:          "3000",
 				POSTGRES_HOST:     "postgres",
 				POSTGRES_DBNAME:   "custom_db",
-				POSTGRES_USER:     "local_user",
-				POSTGRES_PASSWORD: "password",
+				POSTGRES_USER:     "dbuser",
+				POSTGRES_PASSWORD: "Password123",
 				POSTGRES_PORT:     "5432",
 				POSTGRES_SSLMODE:  "disable",
 				LOG_LEVEL:         "debug",
@@ -98,9 +98,9 @@ func TestNewEnv_DefaultValues(t *testing.T) {
 		// Assert
 		assert.Equal(t, "8080", got.APP_PORT, "APP_PORT default value is incorrect")
 		assert.Equal(t, "postgres", got.POSTGRES_HOST, "POSTGRES_HOST default value is incorrect")
-		assert.Equal(t, "POCGO_LOCAL_DB", got.POSTGRES_DBNAME, "POSTGRES_DBNAME default value is incorrect")
-		assert.Equal(t, "local_user", got.POSTGRES_USER, "POSTGRES_USER default value is incorrect")
-		assert.Equal(t, "password", got.POSTGRES_PASSWORD, "POSTGRES_PASSWORD default value is incorrect")
+		assert.Equal(t, "poketierlocal", got.POSTGRES_DBNAME, "POSTGRES_DBNAME default value is incorrect")
+		assert.Equal(t, "dbuser", got.POSTGRES_USER, "POSTGRES_USER default value is incorrect")
+		assert.Equal(t, "Password123", got.POSTGRES_PASSWORD, "POSTGRES_PASSWORD default value is incorrect")
 		assert.Equal(t, "5432", got.POSTGRES_PORT, "POSTGRES_PORT default value is incorrect")
 		assert.Equal(t, "disable", got.POSTGRES_SSLMODE, "POSTGRES_SSLMODE default value is incorrect")
 		assert.Equal(t, "debug", got.LOG_LEVEL, "LOG_LEVEL default value is incorrect")

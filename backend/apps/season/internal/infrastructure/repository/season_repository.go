@@ -22,20 +22,20 @@ type SeasonQuerier interface {
 	DeleteSeason(ctx context.Context, seasonID pgtype.UUID) error
 }
 
-// seasonRepository はSeasonRepositoryの実装
-type seasonRepository struct {
+// SeasonRepository はSeasonRepositoryの実装
+type SeasonRepository struct {
 	queries SeasonQuerier
 }
 
 // NewSeasonRepository は新しいSeasonRepositoryを作成
-func NewSeasonRepository(queries SeasonQuerier) *seasonRepository {
-	return &seasonRepository{
+func NewSeasonRepository(queries SeasonQuerier) *SeasonRepository {
+	return &SeasonRepository{
 		queries: queries,
 	}
 }
 
 // FindByID は指定されたIDのSeasonを取得
-func (r *seasonRepository) FindByID(ctx context.Context, seasonID id.SeasonID) (*entity.Season, error) {
+func (r *SeasonRepository) FindByID(ctx context.Context, seasonID id.SeasonID) (*entity.Season, error) {
 	seasonUUID := pgtype.UUID{
 		Bytes: seasonID.UUID(),
 		Valid: true,
@@ -50,7 +50,7 @@ func (r *seasonRepository) FindByID(ctx context.Context, seasonID id.SeasonID) (
 }
 
 // FindActive はアクティブなSeasonを取得
-func (r *seasonRepository) FindActive(ctx context.Context) (*entity.Season, error) {
+func (r *SeasonRepository) FindActive(ctx context.Context) (*entity.Season, error) {
 	activeSeason, err := r.queries.GetActiveSeason(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get active season: %w", err)
@@ -60,7 +60,7 @@ func (r *seasonRepository) FindActive(ctx context.Context) (*entity.Season, erro
 }
 
 // FindAll は全てのSeasonを取得
-func (r *seasonRepository) FindAll(ctx context.Context) ([]*entity.Season, error) {
+func (r *SeasonRepository) FindAll(ctx context.Context) ([]*entity.Season, error) {
 	dbSeasons, err := r.queries.ListSeasons(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list seasons: %w", err)
@@ -79,7 +79,7 @@ func (r *seasonRepository) FindAll(ctx context.Context) ([]*entity.Season, error
 }
 
 // Save は新しいSeasonを保存
-func (r *seasonRepository) Save(ctx context.Context, season *entity.Season) error {
+func (r *SeasonRepository) Save(ctx context.Context, season *entity.Season) error {
 	params := r.toSaveParams(season)
 
 	_, err := r.queries.SaveSeason(ctx, params)
@@ -91,7 +91,7 @@ func (r *seasonRepository) Save(ctx context.Context, season *entity.Season) erro
 }
 
 // Update は既存のSeasonを更新
-func (r *seasonRepository) Update(ctx context.Context, season *entity.Season) error {
+func (r *SeasonRepository) Update(ctx context.Context, season *entity.Season) error {
 	params := r.toUpdateParams(season)
 
 	_, err := r.queries.UpdateSeason(ctx, params)
@@ -103,7 +103,7 @@ func (r *seasonRepository) Update(ctx context.Context, season *entity.Season) er
 }
 
 // Delete は指定されたIDのSeasonを削除
-func (r *seasonRepository) Delete(ctx context.Context, seasonID id.SeasonID) error {
+func (r *SeasonRepository) Delete(ctx context.Context, seasonID id.SeasonID) error {
 	seasonUUID := pgtype.UUID{
 		Bytes: seasonID.UUID(),
 		Valid: true,
@@ -118,7 +118,7 @@ func (r *seasonRepository) Delete(ctx context.Context, seasonID id.SeasonID) err
 }
 
 // toEntity はデータベースモデルからエンティティに変換
-func (r *seasonRepository) toEntity(dbSeason db.Season) (*entity.Season, error) {
+func (r *SeasonRepository) toEntity(dbSeason db.Season) (*entity.Season, error) {
 	// SeasonIDを変換
 	seasonID := id.SeasonIDFromUUID(dbSeason.SeasonID.Bytes)
 
@@ -141,7 +141,7 @@ func (r *seasonRepository) toEntity(dbSeason db.Season) (*entity.Season, error) 
 }
 
 // toSaveParams はエンティティからSave用パラメータに変換
-func (r *seasonRepository) toSaveParams(season *entity.Season) db.SaveSeasonParams {
+func (r *SeasonRepository) toSaveParams(season *entity.Season) db.SaveSeasonParams {
 	// 終了日の変換
 	var endDate pgtype.Date
 	if season.EndDate() != nil {
@@ -170,7 +170,7 @@ func (r *seasonRepository) toSaveParams(season *entity.Season) db.SaveSeasonPara
 }
 
 // toUpdateParams はエンティティからUpdate用パラメータに変換
-func (r *seasonRepository) toUpdateParams(season *entity.Season) db.UpdateSeasonParams {
+func (r *SeasonRepository) toUpdateParams(season *entity.Season) db.UpdateSeasonParams {
 	// 終了日の変換
 	var endDate pgtype.Date
 	if season.EndDate() != nil {

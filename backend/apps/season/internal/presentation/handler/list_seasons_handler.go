@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type listSeasonsHandler struct {
+type ListSeasonsHandler struct {
 	uc ListSeasonsUseCase
 }
 
@@ -18,13 +18,13 @@ type ListSeasonsUseCase interface {
 	Execute(ctx context.Context) (*usecase.ListSeasonsResult, error)
 }
 
-func NewListSeasonsHandler(uc ListSeasonsUseCase) *listSeasonsHandler {
-	return &listSeasonsHandler{
+func NewListSeasonsHandler(uc ListSeasonsUseCase) *ListSeasonsHandler {
+	return &ListSeasonsHandler{
 		uc: uc,
 	}
 }
 
-func (h *listSeasonsHandler) Handle(ctx *gin.Context) {
+func (h *ListSeasonsHandler) Handle(ctx *gin.Context) {
 	result, err := h.uc.Execute(ctx.Request.Context())
 	if err != nil {
 		errs.HandleError(ctx, err)
