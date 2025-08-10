@@ -36,8 +36,8 @@ func NewSeason(id id.SeasonID, name string, startDate time.Time, endDate *time.T
 }
 
 // ID はSeasonのIDを返す
-func (s *Season) ID() string {
-	return s.id.String()
+func (s *Season) ID() id.SeasonID {
+	return s.id
 }
 
 // Name はSeasonの名前を返す

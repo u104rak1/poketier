@@ -96,7 +96,7 @@ func TestNewSeason(t *testing.T) {
 			}
 			assert.NoError(t, err, "unexpected error occurred")
 			assert.NotNil(t, season, "expected season to be not nil")
-			assert.Equal(t, tt.id.String(), season.ID(), "ID does not match")
+			assert.Equal(t, tt.id.String(), season.ID().String(), "ID does not match")
 			assert.Equal(t, tt.name, season.Name(), "Name does not match")
 			assert.Equal(t, tt.startDate, season.StartDate(), "StartDate does not match")
 			if tt.endDate != nil {

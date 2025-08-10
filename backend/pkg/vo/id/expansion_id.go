@@ -1,5 +1,7 @@
 package id
 
+import "github.com/google/uuid"
+
 // expansionEntity はExpansion集約のマーカー型
 type expansionEntity struct{}
 
@@ -8,10 +10,15 @@ type ExpansionID = ID[expansionEntity]
 
 // NewExpansionID は新しいExpansionIDを生成
 func NewExpansionID() ExpansionID {
-	return New[expansionEntity]()
+	return new[expansionEntity]()
 }
 
-// ReNewExpansionID は文字列からExpansionIDを再作成
-func ReNewExpansionID(s string) (ExpansionID, error) {
-	return ReNew[expansionEntity](s)
+// ExpansionIDFromString は文字列からExpansionIDを再作成
+func ExpansionIDFromString(s string) (ExpansionID, error) {
+	return fromString[expansionEntity](s)
+}
+
+// ExpansionIDFromUUID はuuid.UUIDからExpansionIDを作成
+func ExpansionIDFromUUID(u uuid.UUID) ExpansionID {
+	return fromUUID[expansionEntity](u)
 }

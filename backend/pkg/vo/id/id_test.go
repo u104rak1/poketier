@@ -43,7 +43,25 @@ func TestID_New(t *testing.T) {
 	}
 }
 
-func TestID_ReNew(t *testing.T) {
+func TestID_FromUUID(t *testing.T) {
+	t.Parallel()
+
+	t.Run("正常系: uuid.UUIDからSeasonIDが作成される事", func(t *testing.T) {
+		t.Parallel()
+
+		// Arrange
+		originalUUID := uuid.Must(uuid.NewV7())
+
+		// Act
+		seasonID := id.SeasonIDFromUUID(originalUUID)
+
+		// Assert
+		assert.Equal(t, originalUUID, seasonID.UUID(), "created SeasonID should have same UUID")
+		assert.Equal(t, originalUUID.String(), seasonID.String(), "created SeasonID string should match UUID string")
+	})
+}
+
+func TestID_FromString(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -76,7 +94,7 @@ func TestID_ReNew(t *testing.T) {
 			t.Parallel()
 
 			// Act
-			got, err := id.ReNewSeasonID(tt.input)
+			got, err := id.SeasonIDFromString(tt.input)
 
 			// Assert
 			if tt.wantErr {
@@ -88,6 +106,42 @@ func TestID_ReNew(t *testing.T) {
 			assert.Equal(t, tt.input, got.String(), "regenerated ID should match input")
 		})
 	}
+}
+
+func TestID_String(t *testing.T) {
+	t.Parallel()
+
+	t.Run("正常系: 生成されたIDから文字列が取得できる事", func(t *testing.T) {
+		t.Parallel()
+
+		// Arrange
+		testID := id.NewSeasonID()
+
+		// Act
+		got := testID.String()
+
+		// Assert
+		assert.NotEmpty(t, got, "String should not be empty")
+		assert.Contains(t, got, "-", "String should be UUID format with hyphens")
+	})
+}
+
+func TestID_UUID(t *testing.T) {
+	t.Parallel()
+
+	t.Run("正常系: 生成されたIDからUUIDが取得できる事", func(t *testing.T) {
+		t.Parallel()
+
+		// Arrange
+		testID := id.NewSeasonID()
+
+		// Act
+		got := testID.UUID()
+
+		// Assert
+		assert.NotEqual(t, uuid.Nil, got, "UUID should not be nil")
+		assert.Equal(t, testID.String(), got.String(), "UUID string should match ID string")
+	})
 }
 
 func TestID_Equals(t *testing.T) {
@@ -126,8 +180,8 @@ func TestID_Equals(t *testing.T) {
 
 		// Arrange
 		uuidStr := uuid.Must(uuid.NewV7()).String()
-		id1, _ := id.ReNewSeasonID(uuidStr)
-		id2, _ := id.ReNewSeasonID(uuidStr)
+		id1, _ := id.SeasonIDFromString(uuidStr)
+		id2, _ := id.SeasonIDFromString(uuidStr)
 
 		// Act
 		got := id1.Equals(id2)
@@ -135,89 +189,4 @@ func TestID_Equals(t *testing.T) {
 		// Assert
 		assert.True(t, got, "IDs created from same UUID string should be equal")
 	})
-}
-
-func TestID_Value(t *testing.T) {
-	t.Parallel()
-
-	t.Run("正常系: 生成されたIDからValueが取得できる事", func(t *testing.T) {
-		t.Parallel()
-
-		// Arrange
-		testID := id.NewSeasonID()
-
-		// Act
-		got, err := testID.Value()
-
-		// Assert
-		assert.NoError(t, err, "Value should not return error")
-		assert.Equal(t, testID.String(), got, "Value should match ID string")
-	})
-}
-
-func TestID_Scan(t *testing.T) {
-	t.Parallel()
-
-	originalID := id.NewSeasonID()
-	uuidStr := originalID.String()
-
-	tests := []struct {
-		caseName    string
-		input       interface{}
-		wantErr     bool
-		errContains string
-		want        string
-	}{
-		{
-			caseName: "正常系: 文字列からScanできる事",
-			input:    uuidStr,
-			wantErr:  false,
-			want:     uuidStr,
-		},
-		{
-			caseName: "正常系: バイト配列からScanできる事",
-			input:    []byte(uuidStr),
-			wantErr:  false,
-			want:     uuidStr,
-		},
-		{
-			caseName: "正常系: nilからScanして空文字列になる事",
-			input:    nil,
-			wantErr:  false,
-			want:     "",
-		},
-		{
-			caseName:    "異常系: 無効なUUID文字列が渡された場合",
-			input:       "invalid-uuid",
-			wantErr:     true,
-			errContains: "invalid UUID format",
-		},
-		{
-			caseName:    "異常系: サポートされていない型が渡された場合",
-			input:       123,
-			wantErr:     true,
-			errContains: "cannot scan",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.caseName, func(t *testing.T) {
-			t.Parallel()
-
-			// Arrange
-			var scannedID id.SeasonID
-
-			// Act
-			err := scannedID.Scan(tt.input)
-
-			// Assert
-			if tt.wantErr {
-				assert.Error(t, err, "expected error but got none")
-				assert.Contains(t, err.Error(), tt.errContains, "error message should contain expected text")
-				return
-			}
-			assert.NoError(t, err, "unexpected error occurred")
-			assert.Equal(t, tt.want, scannedID.String(), "scanned ID should match expected value")
-		})
-	}
 }

@@ -1,5 +1,7 @@
 package id
 
+import "github.com/google/uuid"
+
 // cardEntity はCard集約のマーカー型
 type cardEntity struct{}
 
@@ -8,10 +10,15 @@ type CardID = ID[cardEntity]
 
 // NewCardID は新しいCardIDを生成
 func NewCardID() CardID {
-	return New[cardEntity]()
+	return new[cardEntity]()
 }
 
-// ReNewCardID は文字列からCardIDを再作成
-func ReNewCardID(s string) (CardID, error) {
-	return ReNew[cardEntity](s)
+// CardIDFromString は文字列からCardIDを再作成
+func CardIDFromString(s string) (CardID, error) {
+	return fromString[cardEntity](s)
+}
+
+// CardIDFromUUID はuuid.UUIDからCardIDを作成
+func CardIDFromUUID(u uuid.UUID) CardID {
+	return fromUUID[cardEntity](u)
 }

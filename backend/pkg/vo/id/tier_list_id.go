@@ -1,5 +1,7 @@
 package id
 
+import "github.com/google/uuid"
+
 // tierListEntity はTierList集約のマーカー型
 type tierListEntity struct{}
 
@@ -8,10 +10,15 @@ type TierListID = ID[tierListEntity]
 
 // NewTierListID は新しいTierListIDを生成
 func NewTierListID() TierListID {
-	return New[tierListEntity]()
+	return new[tierListEntity]()
 }
 
-// ReNewTierListID は文字列からTierListIDを再作成
-func ReNewTierListID(s string) (TierListID, error) {
-	return ReNew[tierListEntity](s)
+// TierListIDFromString は文字列からTierListIDを再作成
+func TierListIDFromString(s string) (TierListID, error) {
+	return fromString[tierListEntity](s)
+}
+
+// TierListIDFromUUID はuuid.UUIDからTierListIDを作成
+func TierListIDFromUUID(u uuid.UUID) TierListID {
+	return fromUUID[tierListEntity](u)
 }
