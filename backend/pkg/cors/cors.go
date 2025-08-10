@@ -4,7 +4,6 @@ import (
 	"poketier/pkg/str"
 
 	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -12,32 +11,30 @@ var (
 	allowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 )
 
-func SetCORS(r *gin.Engine, allowOrigins string, appEnv string) {
+func GetCORSConfig(allowOrigins string, appEnv string) cors.Config {
 	if appEnv == "production" {
-		setCORSForProd(r, allowOrigins)
+		return getCORSConfigForProd(allowOrigins)
 	} else {
-		setCORSForLocal(r)
+		return getCORSConfigForLocal()
 	}
 }
 
-// setCORSForProd は CORS 設定を適用します。プロダクション環境では環境変数で設定された特定のオリジンのみを許可します。
-func setCORSForProd(r *gin.Engine, allowOrigins string) {
-	corsConfig := cors.Config{
+// getCORSConfigForProd はプロダクション環境のCORS設定を取得します。
+func getCORSConfigForProd(allowOrigins string) cors.Config {
+	return cors.Config{
 		AllowOrigins:     str.CommaSeparatedToSlice(allowOrigins),
 		AllowMethods:     allowMethods,
 		AllowHeaders:     allowHeaders,
 		AllowCredentials: true,
 	}
-	r.Use(cors.New(corsConfig))
 }
 
-// setCORSForLocal は CORS 設定を適用します。ローカル環境では全てのオリジンを許可します。
-func setCORSForLocal(r *gin.Engine) {
-	corsConfig := cors.Config{
+// getCORSConfigForLocal はローカル環境のCORS設定を取得します。
+func getCORSConfigForLocal() cors.Config {
+	return cors.Config{
 		AllowAllOrigins:  true,
 		AllowMethods:     allowMethods,
 		AllowHeaders:     allowHeaders,
 		AllowCredentials: true,
 	}
-	r.Use(cors.New(corsConfig))
 }
