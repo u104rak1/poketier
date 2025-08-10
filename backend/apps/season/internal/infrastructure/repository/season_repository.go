@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 
@@ -125,11 +124,8 @@ func (r *SeasonRepository) toEntity(dbSeason db.Season) (*entity.Season, error) 
 	// 開始日を変換
 	startDate := dbSeason.StartDate.Time
 
-	// 終了日を変換（nilの場合もある）
-	var endDate *time.Time
-	if dbSeason.EndDate.Valid {
-		endDate = &dbSeason.EndDate.Time
-	}
+	// 終了日を変換
+	endDate := dbSeason.EndDate.Time
 
 	// エンティティを作成
 	season, err := entity.NewSeason(seasonID, dbSeason.Name, startDate, endDate)
@@ -142,15 +138,6 @@ func (r *SeasonRepository) toEntity(dbSeason db.Season) (*entity.Season, error) 
 
 // toSaveParams はエンティティからSave用パラメータに変換
 func (r *SeasonRepository) toSaveParams(season *entity.Season) db.SaveSeasonParams {
-	// 終了日の変換
-	var endDate pgtype.Date
-	if season.EndDate() != nil {
-		endDate = pgtype.Date{
-			Time:  *season.EndDate(),
-			Valid: true,
-		}
-	}
-
 	return db.SaveSeasonParams{
 		SeasonID: pgtype.UUID{
 			Bytes: season.ID().UUID(),
@@ -161,9 +148,8 @@ func (r *SeasonRepository) toSaveParams(season *entity.Season) db.SaveSeasonPara
 			Time:  season.StartDate(),
 			Valid: true,
 		},
-		EndDate: endDate,
-		IsActive: pgtype.Bool{
-			Bool:  season.IsActive(),
+		EndDate: pgtype.Date{
+			Time:  season.EndDate(),
 			Valid: true,
 		},
 	}
@@ -171,15 +157,6 @@ func (r *SeasonRepository) toSaveParams(season *entity.Season) db.SaveSeasonPara
 
 // toUpdateParams はエンティティからUpdate用パラメータに変換
 func (r *SeasonRepository) toUpdateParams(season *entity.Season) db.UpdateSeasonParams {
-	// 終了日の変換
-	var endDate pgtype.Date
-	if season.EndDate() != nil {
-		endDate = pgtype.Date{
-			Time:  *season.EndDate(),
-			Valid: true,
-		}
-	}
-
 	return db.UpdateSeasonParams{
 		SeasonID: pgtype.UUID{
 			Bytes: season.ID().UUID(),
@@ -190,9 +167,8 @@ func (r *SeasonRepository) toUpdateParams(season *entity.Season) db.UpdateSeason
 			Time:  season.StartDate(),
 			Valid: true,
 		},
-		EndDate: endDate,
-		IsActive: pgtype.Bool{
-			Bool:  season.IsActive(),
+		EndDate: pgtype.Date{
+			Time:  season.EndDate(),
 			Valid: true,
 		},
 	}

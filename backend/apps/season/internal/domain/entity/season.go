@@ -11,19 +11,15 @@ import (
 type Season struct {
 	id        id.SeasonID
 	name      string
-	isActive  bool
 	startDate time.Time
-	endDate   *time.Time
+	endDate   time.Time
 }
 
 // NewSeason は新しいSeasonインスタンスを作成する
-func NewSeason(id id.SeasonID, name string, startDate time.Time, endDate *time.Time) (*Season, error) {
-	isActive := endDate == nil
-
+func NewSeason(id id.SeasonID, name string, startDate time.Time, endDate time.Time) (*Season, error) {
 	season := &Season{
 		id:        id,
 		name:      name,
-		isActive:  isActive,
 		startDate: startDate,
 		endDate:   endDate,
 	}
@@ -45,9 +41,10 @@ func (s *Season) Name() string {
 	return s.name
 }
 
-// IsActive はSeasonがアクティブかどうかを返す
+// IsActive はSeasonがアクティブかどうかを返す（現在日時が期間内かどうか）
 func (s *Season) IsActive() bool {
-	return s.isActive
+	now := time.Now()
+	return !now.Before(s.startDate) && !now.After(s.endDate)
 }
 
 // StartDate はSeasonの開始日を返す
@@ -55,24 +52,18 @@ func (s *Season) StartDate() time.Time {
 	return s.startDate
 }
 
-// EndDate はSeasonの終了日を返す（nilの場合は進行中）
-func (s *Season) EndDate() *time.Time {
+// EndDate はSeasonの終了日を返す
+func (s *Season) EndDate() time.Time {
 	return s.endDate
 }
 
-// End はSeasonを終了する
+// End はSeasonの終了日を変更する
 func (s *Season) End(endDate time.Time) error {
-	// 既に終了している場合はエラー
-	if !s.isActive {
-		return errors.New("season is already ended")
-	}
-
-	if err := s.validEndDate(&endDate); err != nil {
+	if err := s.validEndDate(endDate); err != nil {
 		return err
 	}
 
-	s.endDate = &endDate
-	s.isActive = false
+	s.endDate = endDate
 
 	return nil
 }
@@ -87,10 +78,8 @@ func (s *Season) validate() error {
 		return err
 	}
 
-	if s.endDate != nil {
-		if err := s.validEndDate(s.endDate); err != nil {
-			return err
-		}
+	if err := s.validEndDate(s.endDate); err != nil {
+		return err
 	}
 
 	return nil
@@ -117,11 +106,7 @@ func (s *Season) validStartDate() error {
 }
 
 // validEndDate は終了日のバリデーションを行う
-func (s *Season) validEndDate(endDate *time.Time) error {
-	if endDate == nil {
-		return nil
-	}
-
+func (s *Season) validEndDate(endDate time.Time) error {
 	if endDate.IsZero() {
 		return errors.New("end date cannot be zero")
 	}

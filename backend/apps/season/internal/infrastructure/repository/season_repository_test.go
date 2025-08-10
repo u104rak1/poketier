@@ -40,7 +40,7 @@ func TestSeasonRepository_FindByID(t *testing.T) {
 				}
 				dbSeason := db.Season{
 					SeasonID: seasonUUID,
-					Name:     "S1",
+					Name:     "A2b",
 					StartDate: pgtype.Date{
 						Time:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 						Valid: true,
@@ -49,21 +49,16 @@ func TestSeasonRepository_FindByID(t *testing.T) {
 						Time:  time.Date(2023, 3, 31, 0, 0, 0, 0, time.UTC),
 						Valid: true,
 					},
-					IsActive: pgtype.Bool{
-						Bool:  false,
-						Valid: true,
-					},
 				}
 				mockQuerier.EXPECT().GetSeason(gomock.Any(), seasonUUID).Return(dbSeason, nil)
 			},
 			seasonID: seasonID,
 			want: func() *entity.Season {
-				endDate := time.Date(2023, 3, 31, 0, 0, 0, 0, time.UTC)
 				season, _ := entity.NewSeason(
 					seasonID,
-					"S1",
+					"A2b",
 					time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-					&endDate,
+					time.Date(2023, 3, 31, 0, 0, 0, 0, time.UTC),
 				)
 				return season
 			}(),
@@ -136,10 +131,7 @@ func TestSeasonRepository_FindActive(t *testing.T) {
 						Valid: true,
 					},
 					EndDate: pgtype.Date{
-						Valid: false,
-					},
-					IsActive: pgtype.Bool{
-						Bool:  true,
+						Time:  time.Date(2023, 12, 31, 23, 59, 59, 0, time.UTC),
 						Valid: true,
 					},
 				}
@@ -150,7 +142,7 @@ func TestSeasonRepository_FindActive(t *testing.T) {
 					seasonID,
 					"S1",
 					time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-					nil,
+					time.Date(2023, 12, 31, 23, 59, 59, 0, time.UTC),
 				)
 				return season
 			}(),
@@ -222,10 +214,6 @@ func TestSeasonRepository_FindAll(t *testing.T) {
 							Time:  time.Date(2023, 3, 31, 0, 0, 0, 0, time.UTC),
 							Valid: true,
 						},
-						IsActive: pgtype.Bool{
-							Bool:  false,
-							Valid: true,
-						},
 					},
 					{
 						SeasonID: pgtype.UUID{
@@ -238,10 +226,7 @@ func TestSeasonRepository_FindAll(t *testing.T) {
 							Valid: true,
 						},
 						EndDate: pgtype.Date{
-							Valid: false,
-						},
-						IsActive: pgtype.Bool{
-							Bool:  true,
+							Time:  time.Date(2023, 6, 30, 0, 0, 0, 0, time.UTC),
 							Valid: true,
 						},
 					},
@@ -249,18 +234,17 @@ func TestSeasonRepository_FindAll(t *testing.T) {
 				mockQuerier.EXPECT().ListSeasons(gomock.Any()).Return(dbSeasons, nil)
 			},
 			want: func() []*entity.Season {
-				endDate := time.Date(2023, 3, 31, 0, 0, 0, 0, time.UTC)
 				season1, _ := entity.NewSeason(
 					seasonID,
 					"S1",
 					time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-					&endDate,
+					time.Date(2023, 3, 31, 0, 0, 0, 0, time.UTC),
 				)
 				season2, _ := entity.NewSeason(
 					seasonID2,
 					"S2",
 					time.Date(2023, 4, 1, 0, 0, 0, 0, time.UTC),
-					nil,
+					time.Date(2023, 6, 30, 0, 0, 0, 0, time.UTC),
 				)
 				return []*entity.Season{season1, season2}
 			}(),
@@ -326,7 +310,7 @@ func TestSeasonRepository_Save(t *testing.T) {
 		expectError bool
 	}{
 		{
-			caseName: "正常系: Seasonが保存できる事（終了日なし）",
+			caseName: "正常系: Seasonが保存できる事",
 			setupMock: func(mockQuerier *MockSeasonQuerier) {
 				expectedParams := db.SaveSeasonParams{
 					SeasonID: pgtype.UUID{
@@ -339,10 +323,7 @@ func TestSeasonRepository_Save(t *testing.T) {
 						Valid: true,
 					},
 					EndDate: pgtype.Date{
-						Valid: false,
-					},
-					IsActive: pgtype.Bool{
-						Bool:  true,
+						Time:  time.Date(2023, 12, 31, 23, 59, 59, 0, time.UTC),
 						Valid: true,
 					},
 				}
@@ -353,14 +334,14 @@ func TestSeasonRepository_Save(t *testing.T) {
 					seasonID,
 					"S1",
 					time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-					nil,
+					time.Date(2023, 12, 31, 23, 59, 59, 0, time.UTC),
 				)
 				return season
 			}(),
 			expectError: false,
 		},
 		{
-			caseName: "正常系: Seasonが保存できる事（終了日あり）",
+			caseName: "正常系: Seasonが保存できる事（別の終了日）",
 			setupMock: func(mockQuerier *MockSeasonQuerier) {
 				expectedParams := db.SaveSeasonParams{
 					SeasonID: pgtype.UUID{
@@ -376,20 +357,15 @@ func TestSeasonRepository_Save(t *testing.T) {
 						Time:  time.Date(2023, 3, 31, 0, 0, 0, 0, time.UTC),
 						Valid: true,
 					},
-					IsActive: pgtype.Bool{
-						Bool:  false,
-						Valid: true,
-					},
 				}
 				mockQuerier.EXPECT().SaveSeason(gomock.Any(), expectedParams).Return(db.Season{}, nil)
 			},
 			season: func() *entity.Season {
-				endDate := time.Date(2023, 3, 31, 0, 0, 0, 0, time.UTC)
 				season, _ := entity.NewSeason(
 					seasonID,
 					"S1",
 					time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-					&endDate,
+					time.Date(2023, 3, 31, 0, 0, 0, 0, time.UTC),
 				)
 				return season
 			}(),
@@ -405,7 +381,7 @@ func TestSeasonRepository_Save(t *testing.T) {
 					seasonID,
 					"S1",
 					time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-					nil,
+					time.Date(2023, 12, 31, 23, 59, 59, 0, time.UTC),
 				)
 				return season
 			}(),
@@ -463,20 +439,15 @@ func TestSeasonRepository_Update(t *testing.T) {
 						Time:  time.Date(2023, 3, 31, 0, 0, 0, 0, time.UTC),
 						Valid: true,
 					},
-					IsActive: pgtype.Bool{
-						Bool:  false,
-						Valid: true,
-					},
 				}
 				mockQuerier.EXPECT().UpdateSeason(gomock.Any(), expectedParams).Return(db.Season{}, nil)
 			},
 			season: func() *entity.Season {
-				endDate := time.Date(2023, 3, 31, 0, 0, 0, 0, time.UTC)
 				season, _ := entity.NewSeason(
 					seasonID,
 					"S1",
 					time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-					&endDate,
+					time.Date(2023, 3, 31, 0, 0, 0, 0, time.UTC),
 				)
 				return season
 			}(),
@@ -492,7 +463,7 @@ func TestSeasonRepository_Update(t *testing.T) {
 					seasonID,
 					"S1",
 					time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-					nil,
+					time.Date(2023, 12, 31, 23, 59, 59, 0, time.UTC),
 				)
 				return season
 			}(),

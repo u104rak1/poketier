@@ -28,8 +28,8 @@ func TestListSeasonUsecase_Execute(t *testing.T) {
 			caseName: "正常系: シーズンが存在する場合、シーズン一覧を返す",
 			setupMock: func(mockRepo *MockLSSeasonRepository) {
 				seasons := []*entity.Season{
-					createTestSeason(t, "A1a", nil),
-					createTestSeason(t, "A1b", &[]time.Time{time.Date(2025, 1, 31, 23, 59, 59, 0, time.UTC)}[0]),
+					createTestSeason(t, "A1a", time.Date(2025, 12, 31, 23, 59, 59, 0, time.UTC)),
+					createTestSeason(t, "A1b", time.Date(2025, 1, 31, 23, 59, 59, 0, time.UTC)),
 				}
 				mockRepo.EXPECT().FindAll(gomock.Any()).Return(seasons, nil)
 			},
@@ -39,14 +39,14 @@ func TestListSeasonUsecase_Execute(t *testing.T) {
 						SeasonID:  "550e8400-e29b-41d4-a716-446655440000",
 						Name:      "A1a",
 						StartDate: time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
-						EndDate:   nil,
+						EndDate:   time.Date(2025, 12, 31, 23, 59, 59, 0, time.UTC),
 						IsActive:  true,
 					},
 					{
 						SeasonID:  "550e8400-e29b-41d4-a716-446655440000",
 						Name:      "A1b",
 						StartDate: time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
-						EndDate:   &[]time.Time{time.Date(2025, 1, 31, 23, 59, 59, 0, time.UTC)}[0],
+						EndDate:   time.Date(2025, 1, 31, 23, 59, 59, 0, time.UTC),
 						IsActive:  false,
 					},
 				},
@@ -107,7 +107,7 @@ func TestListSeasonUsecase_Execute(t *testing.T) {
 }
 
 // createTestSeason はテスト用のSeasonエンティティを作成するヘルパー関数
-func createTestSeason(t *testing.T, name string, endDate *time.Time) *entity.Season {
+func createTestSeason(t *testing.T, name string, endDate time.Time) *entity.Season {
 	t.Helper()
 
 	seasonID, err := id.SeasonIDFromString("550e8400-e29b-41d4-a716-446655440000")

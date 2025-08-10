@@ -13,7 +13,6 @@ type Season struct {
 	Name      string             `json:"name"`
 	StartDate pgtype.Date        `json:"start_date"`
 	EndDate   pgtype.Date        `json:"end_date"`
-	IsActive  pgtype.Bool        `json:"is_active"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }

@@ -16,7 +16,7 @@ type LSSeason struct {
 	SeasonID  string
 	Name      string
 	StartDate time.Time
-	EndDate   *time.Time
+	EndDate   time.Time
 	IsActive  bool
 }
 

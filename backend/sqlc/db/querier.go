@@ -25,8 +25,6 @@ type Querier interface {
 	// シーズンのCRUD操作
 	// Upsert: 存在する場合は更新、しない場合は挿入
 	SaveSeason(ctx context.Context, arg SaveSeasonParams) (Season, error)
-	// 既存のアクティブシーズンを無効化してから新しいシーズンを有効化
-	SetActiveSeason(ctx context.Context, seasonID pgtype.UUID) error
 	UpdateSeason(ctx context.Context, arg UpdateSeasonParams) (Season, error)
 }
 

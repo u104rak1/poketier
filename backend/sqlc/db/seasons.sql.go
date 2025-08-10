@@ -16,7 +16,6 @@ type BulkCreateSeasonsParams struct {
 	Name      string      `json:"name"`
 	StartDate pgtype.Date `json:"start_date"`
 	EndDate   pgtype.Date `json:"end_date"`
-	IsActive  pgtype.Bool `json:"is_active"`
 }
 
 const BulkDeleteSeasons = `-- name: BulkDeleteSeasons :exec
@@ -46,11 +45,10 @@ INSERT INTO seasons (
     season_id,
     name,
     start_date,
-    end_date,
-    is_active
+    end_date
 ) VALUES (
-    $1, $2, $3, $4, $5
-) RETURNING season_id, name, start_date, end_date, is_active, created_at, updated_at
+    $1, $2, $3, $4
+) RETURNING season_id, name, start_date, end_date, created_at, updated_at
 `
 
 type CreateSeasonParams struct {
@@ -58,7 +56,6 @@ type CreateSeasonParams struct {
 	Name      string      `json:"name"`
 	StartDate pgtype.Date `json:"start_date"`
 	EndDate   pgtype.Date `json:"end_date"`
-	IsActive  pgtype.Bool `json:"is_active"`
 }
 
 func (q *Queries) CreateSeason(ctx context.Context, arg CreateSeasonParams) (Season, error) {
@@ -67,7 +64,6 @@ func (q *Queries) CreateSeason(ctx context.Context, arg CreateSeasonParams) (Sea
 		arg.Name,
 		arg.StartDate,
 		arg.EndDate,
-		arg.IsActive,
 	)
 	var i Season
 	err := row.Scan(
@@ -75,7 +71,6 @@ func (q *Queries) CreateSeason(ctx context.Context, arg CreateSeasonParams) (Sea
 		&i.Name,
 		&i.StartDate,
 		&i.EndDate,
-		&i.IsActive,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -103,8 +98,8 @@ func (q *Queries) DeleteSeason(ctx context.Context, seasonID pgtype.UUID) error 
 }
 
 const GetActiveSeason = `-- name: GetActiveSeason :one
-SELECT season_id, name, start_date, end_date, is_active, created_at, updated_at FROM seasons
-WHERE is_active = true
+SELECT season_id, name, start_date, end_date, created_at, updated_at FROM seasons
+WHERE start_date <= CURRENT_DATE AND end_date >= CURRENT_DATE
 LIMIT 1
 `
 
@@ -116,7 +111,6 @@ func (q *Queries) GetActiveSeason(ctx context.Context) (Season, error) {
 		&i.Name,
 		&i.StartDate,
 		&i.EndDate,
-		&i.IsActive,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -124,7 +118,7 @@ func (q *Queries) GetActiveSeason(ctx context.Context) (Season, error) {
 }
 
 const GetSeason = `-- name: GetSeason :one
-SELECT season_id, name, start_date, end_date, is_active, created_at, updated_at FROM seasons
+SELECT season_id, name, start_date, end_date, created_at, updated_at FROM seasons
 WHERE season_id = $1
 `
 
@@ -136,7 +130,6 @@ func (q *Queries) GetSeason(ctx context.Context, seasonID pgtype.UUID) (Season, 
 		&i.Name,
 		&i.StartDate,
 		&i.EndDate,
-		&i.IsActive,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -144,7 +137,7 @@ func (q *Queries) GetSeason(ctx context.Context, seasonID pgtype.UUID) (Season, 
 }
 
 const ListSeasons = `-- name: ListSeasons :many
-SELECT season_id, name, start_date, end_date, is_active, created_at, updated_at FROM seasons
+SELECT season_id, name, start_date, end_date, created_at, updated_at FROM seasons
 ORDER BY start_date DESC
 `
 
@@ -162,7 +155,6 @@ func (q *Queries) ListSeasons(ctx context.Context) ([]Season, error) {
 			&i.Name,
 			&i.StartDate,
 			&i.EndDate,
-			&i.IsActive,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -182,17 +174,15 @@ INSERT INTO seasons (
     season_id,
     name,
     start_date,
-    end_date,
-    is_active
+    end_date
 ) VALUES (
-    $1, $2, $3, $4, $5
+    $1, $2, $3, $4
 ) ON CONFLICT (season_id) 
 DO UPDATE SET
     name = EXCLUDED.name,
     start_date = EXCLUDED.start_date,
-    end_date = EXCLUDED.end_date,
-    is_active = EXCLUDED.is_active
-RETURNING season_id, name, start_date, end_date, is_active, created_at, updated_at
+    end_date = EXCLUDED.end_date
+RETURNING season_id, name, start_date, end_date, created_at, updated_at
 `
 
 type SaveSeasonParams struct {
@@ -200,7 +190,6 @@ type SaveSeasonParams struct {
 	Name      string      `json:"name"`
 	StartDate pgtype.Date `json:"start_date"`
 	EndDate   pgtype.Date `json:"end_date"`
-	IsActive  pgtype.Bool `json:"is_active"`
 }
 
 // シーズンのCRUD操作
@@ -211,7 +200,6 @@ func (q *Queries) SaveSeason(ctx context.Context, arg SaveSeasonParams) (Season,
 		arg.Name,
 		arg.StartDate,
 		arg.EndDate,
-		arg.IsActive,
 	)
 	var i Season
 	err := row.Scan(
@@ -219,25 +207,10 @@ func (q *Queries) SaveSeason(ctx context.Context, arg SaveSeasonParams) (Season,
 		&i.Name,
 		&i.StartDate,
 		&i.EndDate,
-		&i.IsActive,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
 	return i, err
-}
-
-const SetActiveSeason = `-- name: SetActiveSeason :exec
-UPDATE seasons 
-SET is_active = CASE 
-    WHEN season_id = $1 THEN true 
-    ELSE false 
-END
-`
-
-// 既存のアクティブシーズンを無効化してから新しいシーズンを有効化
-func (q *Queries) SetActiveSeason(ctx context.Context, seasonID pgtype.UUID) error {
-	_, err := q.db.Exec(ctx, SetActiveSeason, seasonID)
-	return err
 }
 
 const UpdateSeason = `-- name: UpdateSeason :one
@@ -245,10 +218,9 @@ UPDATE seasons
 SET 
     name = $2,
     start_date = $3,
-    end_date = $4,
-    is_active = $5
+    end_date = $4
 WHERE season_id = $1
-RETURNING season_id, name, start_date, end_date, is_active, created_at, updated_at
+RETURNING season_id, name, start_date, end_date, created_at, updated_at
 `
 
 type UpdateSeasonParams struct {
@@ -256,7 +228,6 @@ type UpdateSeasonParams struct {
 	Name      string      `json:"name"`
 	StartDate pgtype.Date `json:"start_date"`
 	EndDate   pgtype.Date `json:"end_date"`
-	IsActive  pgtype.Bool `json:"is_active"`
 }
 
 func (q *Queries) UpdateSeason(ctx context.Context, arg UpdateSeasonParams) (Season, error) {
@@ -265,7 +236,6 @@ func (q *Queries) UpdateSeason(ctx context.Context, arg UpdateSeasonParams) (Sea
 		arg.Name,
 		arg.StartDate,
 		arg.EndDate,
-		arg.IsActive,
 	)
 	var i Season
 	err := row.Scan(
@@ -273,7 +243,6 @@ func (q *Queries) UpdateSeason(ctx context.Context, arg UpdateSeasonParams) (Sea
 		&i.Name,
 		&i.StartDate,
 		&i.EndDate,
-		&i.IsActive,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

@@ -33,7 +33,6 @@ func (r iteratorForBulkCreateSeasons) Values() ([]interface{}, error) {
 		r.rows[0].Name,
 		r.rows[0].StartDate,
 		r.rows[0].EndDate,
-		r.rows[0].IsActive,
 	}, nil
 }
 
@@ -42,5 +41,5 @@ func (r iteratorForBulkCreateSeasons) Err() error {
 }
 
 func (q *Queries) BulkCreateSeasons(ctx context.Context, arg []BulkCreateSeasonsParams) (int64, error) {
-	return q.db.CopyFrom(ctx, []string{"seasons"}, []string{"season_id", "name", "start_date", "end_date", "is_active"}, &iteratorForBulkCreateSeasons{rows: arg})
+	return q.db.CopyFrom(ctx, []string{"seasons"}, []string{"season_id", "name", "start_date", "end_date"}, &iteratorForBulkCreateSeasons{rows: arg})
 }

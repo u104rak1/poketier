@@ -11,11 +11,11 @@ type ListSeasonsResponse struct {
 }
 
 type LSSeason struct {
-	SeasonID  string     `json:"season_id"`
-	Name      string     `json:"name"`
-	StartDate time.Time  `json:"start_date"`
-	EndDate   *time.Time `json:"end_date,omitempty"`
-	IsActive  bool       `json:"is_active"`
+	SeasonID  string    `json:"season_id"`
+	Name      string    `json:"name"`
+	StartDate time.Time `json:"start_date"`
+	EndDate   time.Time `json:"end_date"`
+	IsActive  bool      `json:"is_active"`
 }
 
 func NewListSeasonsResponse(result *usecase.ListSeasonsResult) ListSeasonsResponse {

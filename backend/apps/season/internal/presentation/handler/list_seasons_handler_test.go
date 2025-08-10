@@ -32,22 +32,24 @@ func TestListSeasonsHandler_Handle(t *testing.T) {
 		{
 			caseName: "正常系: シーズン一覧が正常に取得される",
 			mockSetup: func(mockUC *MockListSeasonsUseCase) {
-				startDate := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
-				endDate := time.Date(2024, 12, 31, 23, 59, 59, 0, time.UTC)
+				startDate1 := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+				endDate1 := time.Date(2024, 12, 31, 23, 59, 59, 0, time.UTC)
+				startDate2 := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
+				endDate2 := time.Date(2023, 12, 31, 23, 59, 59, 0, time.UTC)
 				result := &usecase.ListSeasonsResult{
 					Seasons: []usecase.LSSeason{
 						{
 							SeasonID:  "season-1",
 							Name:      "2024 シーズン",
-							StartDate: startDate,
-							EndDate:   &endDate,
+							StartDate: startDate1,
+							EndDate:   endDate1,
 							IsActive:  true,
 						},
 						{
 							SeasonID:  "season-2",
 							Name:      "2023 シーズン",
-							StartDate: time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-							EndDate:   nil,
+							StartDate: startDate2,
+							EndDate:   endDate2,
 							IsActive:  false,
 						},
 					},
@@ -62,14 +64,14 @@ func TestListSeasonsHandler_Handle(t *testing.T) {
 						SeasonID:  "season-1",
 						Name:      "2024 シーズン",
 						StartDate: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
-						EndDate:   func() *time.Time { t := time.Date(2024, 12, 31, 23, 59, 59, 0, time.UTC); return &t }(),
+						EndDate:   time.Date(2024, 12, 31, 23, 59, 59, 0, time.UTC),
 						IsActive:  true,
 					},
 					{
 						SeasonID:  "season-2",
 						Name:      "2023 シーズン",
 						StartDate: time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-						EndDate:   nil,
+						EndDate:   time.Date(2023, 12, 31, 23, 59, 59, 0, time.UTC),
 						IsActive:  false,
 					},
 				},
